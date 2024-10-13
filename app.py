@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string, url_for
+from flask import Flask, request, render_template_string, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import logging
 import html
@@ -70,6 +70,19 @@ def display_requests():
         requests_html += f'<li>{req}</li>'
     requests_html += '</ul>'
     return render_template_string(requests_html)
+
+@app.route('/redirect', methods=['GET'])
+def open_redirect():
+    # Get the redirect URL from the query parameter
+    redirect_url = request.args.get('url', '')
+    
+    # Here, you would typically validate the redirect_url to prevent open redirects
+    # For demonstration, we'll just redirect without validation
+    if redirect_url:
+        app.logger.info(f'Redirecting to: {redirect_url}')
+        return redirect(redirect_url)
+    
+    return 'No URL provided for redirection.'
 
 if __name__ == '__main__':
     app.run(debug=True)
