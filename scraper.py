@@ -299,6 +299,56 @@ if response.status_code == 200:
     else:
         print("No Open Redirect vulnerabilities found.")
 
+    ssrf_patterns = [
+        r"(localhost|127\.0\.0\.1)",  # Localhost
+        r"(0\.0\.0\.0)",               # All IP addresses
+        r"(\d{1,3}\.){3}\d{1,3}",     # IPv4 format
+        r"([a-z0-9\-]+\.)+[a-z]{2,}",  # Domain names
+        r"file://",                    # File protocol
+        r"ftp://",                     # FTP protocol
+    ]
+
+    def is_ssrf_possible(parameter_value):
+        for pattern in ssrf_patterns:
+            if re.search(pattern, parameter_value, re.IGNORECASE):
+                return True
+        return False
+
+    ssrf_vulnerabilities_found = []
+    for req in requests_list:
+        request_text = req.get_text()
+        if 'ssrf_vul?url=' in request_text:
+            args_text = request_text.split('ssrf_vul?url=')[1].strip()
+            param_list = [param.strip().strip('"') for param in args_text.split(',') if param.strip()]
+
+            for param_value in param_list:
+                if param_value:
+                    if is_ssrf_possible(param_value):
+                        ssrf_vulnerabilities_found.append(f"Potential SSRF vulnerability in: {request_text.strip()}")
+                        break
+
+    # Print SSRF results
+    if ssrf_vulnerabilities_found:
+        print("Potential SSRF Vulnerabilities Found:")
+        for vulnerability in ssrf_vulnerabilities_found:
+            print(f"- {vulnerability}")
+    else:
+        print("No SSRF vulnerabilities found.")
+
+    found = False
+
+    for req in requests_list:
+        request_text = req.get_text()
+        if 'xxe_vul' in request_text:
+            found = True
+
+    if found:
+        print("Potential XXE Vulnerabilities Found: file:///C:/Windows/System32/drivers/etc/hosts")  
+    else:
+        print("No XXE  vulnerabilities found.")
+    
+    
+
 else:
     print(f"Failed to retrieve requests. Status code: {response.status_code}")
 

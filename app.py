@@ -2,6 +2,8 @@ from flask import Flask, request, render_template, redirect, url_for, render_tem
 import logging
 import html
 import subprocess
+import requests
+from lxml import etree  # Make sure you have lxml installed
 
 app = Flask(__name__)
 
@@ -115,6 +117,72 @@ def display_requests():
         requests_html += f'<li>{req}</li>'
     requests_html += '</ul>'
     return render_template_string(requests_html)
+
+# Sensitive data page that should not be accessible
+@app.route('/admin', methods=['GET'])
+def admin():
+    # Simulate sensitive data like usernames, emails, and passwords
+    sensitive_data = '''
+    <h1>Admin Panel</h1>
+    <p><strong>Username:</strong> admin</p>
+    <p><strong>Password:</strong> admin1234</p>
+    <p><strong>User 1:</strong> user1@example.com, Password: password1</p>
+    <p><strong>User 2:</strong> user2@example.com, Password: password2</p>
+    <p><strong>User 3:</strong> user3@example.com, Password: password3</p>
+    '''
+    return render_template_string(sensitive_data)
+
+@app.route('/ssrf', methods=['GET'])
+def ssrf():
+    return render_template('ssrf.html')
+
+@app.route('/ssrf_vul', methods=['GET', 'POST'])
+def ssrf_vul():
+    url_to_fetch = request.args.get('url', '')
+    fetched_data = None
+    error = None
+
+    if url_to_fetch:
+        try:
+            # Make a request to the user-provided URL
+            response = requests.get(url_to_fetch, timeout=5)
+            fetched_data = response.text
+            app.logger.info(f"Fetched data from {url_to_fetch}")
+        except requests.exceptions.RequestException as e:
+            error = f"Error: {str(e)}"
+            app.logger.error(f"SSRF attempt failed: {str(e)}")
+
+    return render_template('ssrf_vul.html', url_to_fetch=url_to_fetch, fetched_data=fetched_data, error=error)
+
+
+
+@app.route('/xxe_vul', methods=['GET', 'POST'])
+def xxe_vul():
+    fetched_data = None
+    error = None
+
+    if request.method == 'POST':
+        # Simulate attacker sending a crafted XML document for Windows
+        xxe_payload = '''<?xml version="1.0"?>
+<!DOCTYPE foo [
+    <!ENTITY xxe SYSTEM "file:///C:/Windows/System32/drivers/etc/hosts">
+]>
+<foo>XXE Test: &xxe;</foo>
+        '''
+        try:
+            # Parse the XML data (simulate the processing)
+            parser = etree.XMLParser(load_dtd=True, resolve_entities=True)  # Enable DTD loading and entity resolution
+            xml_data = etree.fromstring(xxe_payload.encode('utf-8'), parser)
+            fetched_data = xml_data.text  # Extract text content
+            app.logger.info(f"Fetched data: {fetched_data}")
+        except Exception as e:
+            error = f"Error: {str(e)}"
+            app.logger.error(f"XXE attempt failed: {str(e)}")
+
+    return render_template('xxe_vul.html', fetched_data=fetched_data, error=error)
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

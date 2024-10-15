@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding SSRF Vulnerabilities</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Understanding SSRF Vulnerabilities</h1>
+        <p>
+            Server-Side Request Forgery (SSRF) is a <strong>security vulnerability</strong> that allows an attacker to
+            send crafted requests from the server-side application to any internal or external resource.
+            This can result in unauthorized access to sensitive data, internal services, or even remote endpoints.
+        </p>
+        <div class="highlight">
+            <p><strong>Example:</strong> An attacker might exploit an SSRF vulnerability to make the server request
+                <code>http://localhost:5000/admin</code>, accessing sensitive admin information.
+            </p>
+        </div>
+        <p>
+            SSRF attacks can lead to <strong>data exposure</strong>, <strong>service disruption</strong>, and even
+            <strong>remote code execution</strong> under certain conditions.
+            To prevent SSRF vulnerabilities, developers should implement strict request validation, avoid allowing
+            user-controlled input for URL fetching, and use a whitelisting approach for allowed endpoints.
+        </p>
+        <ul>
+            <li><a href="{{ url_for('ssrf_vul', url='http://localhost:5000/admin') }}">http://localhost:5000/admin</a>
+            </li>
+            <li><a
+                    href="{{ url_for('ssrf_vul', url='http://localhost:5000/sql-injection') }}">http://localhost:5000/sql-injection</a>
+            </li>
+            <li><a href="{{ url_for('ssrf_vul', url='http://localhost:5000/xss') }}">http://localhost:5000/xss</a></li>
+            <li><a
+                    href="{{ url_for('ssrf_vul', url='http://localhost:5000/com_inj') }}">http://localhost:5000/com_inj</a>
+            </li>
+        </ul>
+        <div class="footer">
+            <p>Use this information wisely and only test for vulnerabilities on systems you have explicit permission to
+                test.</p>
+            <a href="{{ url_for('home') }}">Back to Home</a>
+        </div>
+    </div>
+</body>
+
+</html>

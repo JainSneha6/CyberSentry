@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding XXE Vulnerabilities</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Understanding XXE Vulnerabilities</h1>
+        <p>
+            XML External Entity (XXE) vulnerabilities allow an attacker to interfere with the processing of XML data.
+            This can lead to the exposure of sensitive data, server-side request forgery (SSRF), and other attacks.
+        </p>
+        <div class="highlight">
+            <p><strong>Example:</strong> An attacker might exploit an XXE vulnerability to send a specially crafted XML
+                document
+                that includes external entity references, potentially accessing files on the server like:
+                <code>file:///etc/passwd</code>.
+            </p>
+        </div>
+        <p>
+            XXE attacks can lead to <strong>data exfiltration</strong>, <strong>service disruption</strong>, and
+            <strong>denial of service</strong>.
+            To prevent XXE vulnerabilities, developers should ensure that XML parsers are configured securely,
+            disable external entity processing, and validate or sanitize all XML input.
+        </p>
+        <p>
+            You can simulate an XXE attack by clicking the button below:
+        </p>
+        <form action="{{ url_for('xxe_vul') }}" method="post">
+            <button type="submit">Simulate XXE Attack</button>
+        </form>
+
+        {% if fetched_data %}
+        <h2>Fetched Data:</h2>
+        <pre>{{ fetched_data }}</pre>
+        {% elif error %}
+        <h2>Error:</h2>
+        <pre>{{ error }}</pre>
+        {% endif %}
+
+        <div class="footer">
+            <p>Use this information wisely and only test for vulnerabilities on systems you have explicit permission to
+                test.</p>
+            <a href="{{ url_for('home') }}">Back to Home</a>
+        </div>
+    </div>
+</body>
+
+</html>
