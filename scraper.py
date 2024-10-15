@@ -38,7 +38,7 @@ class CyberSecurityScannerApp:
         master.geometry("900x700")
         master.configure(bg="#0A0E12")
 
-        self.url = "http://localhost:5000/requests"  # Hard-coded URL (not displayed)
+        self.url = "http://localhost:5000/requests"  
         self.create_widgets()
 
     def create_widgets(self):
