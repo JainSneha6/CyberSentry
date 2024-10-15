@@ -4,22 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XXE Vulnerability Result</title>
-    <link rel="stylesheet" href="static/styles.css">
+    <title>XSS Vulnerability</title>
+    <link rel="stylesheet" href="static/styles1.css">
 </head>
 
 <body>
     <div class="container">
-        <h1>XXE Vulnerability Result</h1>
-        {% if error %}
-        <p style="color: red;">{{ error }}</p>
-        {% elif result %}
-        <p>Parsed XML result: {{ result }}</p>
-        {% else %}
-        <p>No XML input was provided.</p>
-        {% endif %}
+        <h1>CROSS-SITE SCRIPTING VULNERABILITY FOUND!!</h1>
+        {{ user_input|safe}}
+        <p>This is a serious security issue that requires immediate attention.</p>
         <div class="footer">
-            <a href="{{ url_for('xxe') }}">Try again</a>
+            <p>For further assistance, please contact your security team.</p>
             <a href="{{ url_for('home') }}">Back to Home</a>
         </div>
     </div>
