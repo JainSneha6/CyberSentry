@@ -4,29 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IDOR Vulnerability</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(120deg, #e67e22, #d35400);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-            font-size: 1.8em;
-            color: #f7f7f7;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="static/styles1.css">
 </head>
 <body>
-    <h1>Insecure Direct Object References VULNERABILITY FOUND!!</h1>
+    <div class="container">
+        <h1>INSECURE DIRECT OBJECT REFERENCES VULNERABILITY FOUND!!</h1>
+        <p>This is a serious security issue that requires immediate attention.</p>
+        <div class="footer">
+            <p>For further assistance, please contact your security team.</p>
+            <a href="{{ url_for('home') }}">Back to Home</a>
+        </div>
+    </div>
 </body>
 </html>

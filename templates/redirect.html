@@ -4,123 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Understanding Open Redirect Vulnerabilities</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(120deg, #f1c40f, #f39c12); 
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px 30px;
-            border-radius: 15px;
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-            font-size: 1.8em;
-            color: #f7f7f7;
-            text-align: center;
-        }
-
-        p {
-            line-height: 1.6;
-            margin: 15px 0;
-            color: #eee;
-        }
-
-        .highlight {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 15px;
-            word-wrap: break-word;
-            transition: background 0.3s ease;
-        }
-
-        .highlight strong {
-            color: red;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        ul li {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            word-wrap: break-word;
-            transition: background 0.3s ease;
-        }
-
-        ul li:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        ul li a {
-            color: #fff;
-            text-decoration: none;
-            word-break: break-word;
-        }
-
-        ul li a:hover {
-            text-decoration: underline;
-        }
-
-        .footer {
-            margin-top: 15px;
-            text-align: center;
-            font-size: 0.9em;
-            color: #ddd;
-        }
-
-        .footer a {
-            color: #fff;
-            text-decoration: underline;
-            transition: color 0.3s ease;
-        }
-
-        .footer a:hover {
-            color: #f1c40f;
-        }
-
-        /* Custom scrollbar styling */
-        .container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .container::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-
-        .container::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-        }
-
-        .container::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
-        }
-    </style>
+    <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
     <div class="container">
@@ -136,10 +20,10 @@
             To prevent open redirects, applications should validate and sanitize user inputs, ensuring only trusted URLs are allowed for redirection.
         </p>
         <ul>
-            <li><a href="{{ url_for('open_redirect_vul', url='http://mali.com') }}">http://</a></li>
-            <li><a href="{{ url_for('open_redirect_vul', url='https://phis.com') }}">https://</a></li>
-            <li><a href="{{ url_for('open_redirect_vul', url='//un.com') }}">Protocol-relative URL</a></li>
-            <li><a href="{{ url_for('open_redirect_vul', url='//att.com') }}">Another Protocol-relative URL</a></li>
+            <li><a href="{{ url_for('open_redirect_vul', url='http://malicious.com') }}">http://</a></li>
+            <li><a href="{{ url_for('open_redirect_vul', url='https://phising.com') }}">https://</a></li>
+            <li><a href="{{ url_for('open_redirect_vul', url='//unsafe.com') }}">Protocol-relative URL</a></li>
+            <li><a href="{{ url_for('open_redirect_vul', url='//attacker.com') }}">Another Protocol-relative URL</a></li>
         </ul>
         <div class="footer">
             <p>Use this information wisely and only test for vulnerabilities on systems you have explicit permission to test.</p>
