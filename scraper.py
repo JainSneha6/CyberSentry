@@ -210,13 +210,12 @@ if response.status_code == 200:
         return False
 
     file_inclusion_vulnerabilities_found = []
-    # Check for File Inclusion (LFI/RFI)
     for req in requests_list:
         request_text = req.get_text()
         if 'file_inclusion_vul?file=' in request_text:
             args_text = request_text.split('file_inclusion_vul?file=')[1].strip()
             param_list = [param.strip().strip('"') for param in args_text.split(',') if param.strip()]
-            param_list = [param for param in param_list if 'file' not in param]
+            param_list = [param for param in param_list]
 
             for param_value in param_list:
                 if param_value:
@@ -246,11 +245,10 @@ if response.status_code == 200:
         return False
     
     directory_vulnerabilities_found = []
-    # Check for File Inclusion (LFI/RFI)
     for req in requests_list:
         request_text = req.get_text()
-        if 'example?file=' in request_text:
-            args_text = request_text.split('example?file=')[1].strip()
+        if 'dir_trav_vul?pattern=' in request_text:
+            args_text = request_text.split('dir_trav_vul?pattern=')[1].strip()
             param_list = [param.strip().strip('"') for param in args_text.split(',') if param.strip()]
             param_list = [param for param in param_list if 'file' not in param]
 
@@ -284,9 +282,8 @@ if response.status_code == 200:
     # Check for Open Redirect
     for req in requests_list:
         request_text = req.get_text()
-        if 'redirect?url=' in request_text:
-            print(request_text)
-            args_text = request_text.split('redirect?url=')[1].strip()
+        if 'open_redirect_vul?url=' in request_text:
+            args_text = request_text.split('open_redirect_vul?url=')[1].strip()
             param_list = [param.strip() for param in args_text.split('&') if param.strip()]
 
             for param_value in param_list:

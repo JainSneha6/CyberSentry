@@ -84,6 +84,29 @@ def file_inclusion():
 def file_inclusion_vul():
     return render_template('file_inclusion_vul.html')
 
+@app.route('/dir_trav', methods=['GET'])
+def dir_trav():
+    return render_template('dir_trav.html')
+
+@app.route('/dir_trav_vul', methods=['GET'])
+def dir_trav_vul():
+    pattern = request.args.get('pattern', '')
+    return render_template('dir_trav_vul.html',pattern=pattern)
+
+@app.route('/redirect', methods=['GET', 'POST'])
+def open_redirect():
+    return render_template('redirect.html')
+
+@app.route('/open_redirect_vul', methods=['GET'])
+def open_redirect_vul():
+    redirect_url = ''
+    redirect_url = request.form.get('url', '')
+        
+    if redirect_url:
+        app.logger.info(f'Redirecting to: {redirect_url}')
+        return redirect(redirect_url)
+    return render_template('open_redirect_vul.html', redirect_url=redirect_url)
+
 @app.route('/requests', methods=['GET'])
 def display_requests():
     # Render all GET requests in a simple HTML page
@@ -92,18 +115,6 @@ def display_requests():
         requests_html += f'<li>{req}</li>'
     requests_html += '</ul>'
     return render_template_string(requests_html)
-
-@app.route('/redirect', methods=['GET', 'POST'])
-def open_redirect():
-    redirect_url = ''
-    if request.method == 'POST':
-        redirect_url = request.form.get('url', '')
-        
-        if redirect_url:
-            app.logger.info(f'Redirecting to: {redirect_url}')
-            return redirect(redirect_url)
-    
-    return render_template('redirect.html', redirect_url=redirect_url)
 
 if __name__ == '__main__':
     app.run(debug=True)

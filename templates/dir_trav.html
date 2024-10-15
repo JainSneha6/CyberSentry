@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Understanding Open Redirect Vulnerabilities</title>
+    <title>Understanding Directory Traversal Vulnerabilities</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(120deg, #f1c40f, #f39c12); 
+            background: linear-gradient(120deg, #ff6bcb, #e84393);
             color: #fff;
             display: flex;
             justify-content: center;
@@ -53,7 +53,7 @@
         }
 
         .highlight strong {
-            color: red;
+            color: #f1c40f;
         }
 
         ul {
@@ -124,22 +124,23 @@
 </head>
 <body>
     <div class="container">
-        <h1>Understanding Open Redirect Vulnerabilities</h1>
+        <h1>Understanding Directory Traversal Vulnerabilities</h1>
         <p>
-            Open Redirect vulnerabilities occur when an application takes a user-supplied URL and redirects the user to that URL without proper validation. 
-            Attackers can exploit this to redirect users to malicious sites.
+            Directory Traversal vulnerabilities allow attackers to access directories and files stored outside the web root folder. 
+            This can be exploited to read sensitive files and access system-level information.
         </p>
         <div class="highlight">
-            <p><strong>Example:</strong> An attacker might use a URL like <code>example.com/redirect?url=http://malic-site.com</code> to redirect users to an external website.</p>
+            <p><strong>Example:</strong> An attacker might manipulate a URL to access restricted files, such as <code>example.com/file=../../etc/passwd</code>.</p>
         </div>
         <p>
-            To prevent open redirects, applications should validate and sanitize user inputs, ensuring only trusted URLs are allowed for redirection.
+            These vulnerabilities can result in serious security issues, including data exposure and unauthorized access. 
+            Developers should validate input, sanitize paths, and use secure file handling functions to mitigate these risks.
         </p>
         <ul>
-            <li><a href="{{ url_for('open_redirect_vul', url='http://mali.com') }}">http://</a></li>
-            <li><a href="{{ url_for('open_redirect_vul', url='https://phis.com') }}">https://</a></li>
-            <li><a href="{{ url_for('open_redirect_vul', url='//un.com') }}">Protocol-relative URL</a></li>
-            <li><a href="{{ url_for('open_redirect_vul', url='//att.com') }}">Another Protocol-relative URL</a></li>
+            <li><a href="{{ url_for('dir_trav_vul', pattern='../../../../') }}">../../../../</a></li>
+            <li><a href="{{ url_for('dir_trav_vul', pattern='../') }}">../</a></li>
+            <li><a href="{{ url_for('dir_trav_vul', pattern='/etc/passwd') }}">/etc/passwd</a></li>
+            <li><a href="{{ url_for('dir_trav_vul', pattern='boot.ini') }}">boot.ini</a></li>
         </ul>
         <div class="footer">
             <p>Use this information wisely and only test for vulnerabilities on systems you have explicit permission to test.</p>

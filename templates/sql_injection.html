@@ -7,44 +7,56 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(120deg, #e74c3c, #c0392b);
-            color: #fff;
+            background: #0a0a0a; /* Dark background for a clean look */
+            color: #00ffcc; /* Cyber-themed color */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes pulseShadow {
+            0% {
+                box-shadow: 0px 0px 20px rgba(0, 255, 204, 0.2);
+            }
+            100% {
+                box-shadow: 0px 0px 40px rgba(0, 255, 204, 0.5);
+            }
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px 30px;
+            margin-top:25px;
+            background: rgba(0, 0, 0, 0.7); /* Transparent black background for contrast */
+            padding: 30px;
             border-radius: 15px;
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            max-width: 600px;
+            animation: pulseShadow 2s infinite alternate; /* Pulsating shadow animation */
+            backdrop-filter: blur(5px);
+            max-width: 700px;
             width: 90%;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
+            z-index: 1;
         }
 
         h1 {
             margin-bottom: 20px;
-            font-size: 1.8em;
-            color: #f7f7f7;
+            font-size: 2.5em; /* Larger font size for header */
+            color: #00ffcc; /* Neon-like color for a tech feel */
+            font-family: 'Courier New', monospace; /* Terminal-like font */
             text-align: center;
         }
 
         p {
             line-height: 1.6;
             margin: 15px 0;
-            color: #eee;
+            color: #eee; /* Light text color for readability */
         }
 
         .highlight {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             padding: 12px;
             border-radius: 8px;
             margin-top: 15px;
@@ -53,7 +65,7 @@
         }
 
         .highlight strong {
-            color: #f1c40f;
+            color: #00ffcc; /* Highlight strong text */
         }
 
         ul {
@@ -63,7 +75,7 @@
         }
 
         ul li {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             padding: 12px;
             margin: 8px 0;
             border-radius: 8px;
@@ -72,17 +84,17 @@
         }
 
         ul li:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2); /* Lighter on hover */
         }
 
         ul li a {
-            color: #fff;
+            color: #00ffcc; /* Link color */
             text-decoration: none;
             word-break: break-word;
         }
 
         ul li a:hover {
-            text-decoration: underline;
+            text-decoration: underline; /* Underline on hover */
         }
 
         .footer {
@@ -93,13 +105,13 @@
         }
 
         .footer a {
-            color: #fff;
+            color: #00ffcc; /* Footer link color */
             text-decoration: underline;
             transition: color 0.3s ease;
         }
 
         .footer a:hover {
-            color: #f1c40f;
+            color: #f1c40f; /* Change color on hover */
         }
 
         /* Custom scrollbar styling */
@@ -126,7 +138,7 @@
     <div class="container">
         <h1>Understanding SQL Injections</h1>
         <p>
-            SQL Injection is a <strong>security vul</strong> that allows an attacker to interfere with the queries that an application makes to its database. 
+            SQL Injection is a <strong>security vulnerability</strong> that allows an attacker to interfere with the queries that an application makes to its database. 
             By manipulating input fields, attackers can inject their own SQL commands, gaining unauthorized access or modifying the database.
         </p>
         <div class="highlight">
