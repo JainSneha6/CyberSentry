@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection Information</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(120deg, #e74c3c, #c0392b);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #f7f7f7;
+            text-align: center;
+        }
+
+        p {
+            line-height: 1.6;
+            margin: 15px 0;
+            color: #eee;
+        }
+
+        .highlight {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            word-wrap: break-word;
+            transition: background 0.3s ease;
+        }
+
+        .highlight strong {
+            color: #f1c40f;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            word-wrap: break-word;
+            transition: background 0.3s ease;
+        }
+
+        ul li:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        ul li a {
+            color: #fff;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #ddd;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #f1c40f;
+        }
+
+        /* Custom scrollbar styling */
+        .container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Understanding SQL Injections</h1>
+        <p>
+            SQL Injection is a <strong>security vul</strong> that allows an attacker to interfere with the queries that an application makes to its database. 
+            By manipulating input fields, attackers can inject their own SQL commands, gaining unauthorized access or modifying the database.
+        </p>
+        <div class="highlight">
+            <p><strong>Example:</strong> A simple SQL Injection attack could involve entering <code>' OR '1'='1</code> into a login field, which might alter a query to always return true, potentially granting access without a valid password.</p>
+        </div>
+        <p>
+            This type of attack can lead to serious risks such as <strong>data theft</strong>, <strong>loss of data integrity</strong>, and even <strong>complete control over the database</strong>. 
+            It is essential to secure applications by using prepared statements, input validation, and proper sanitization.
+        </p>
+        <ul>
+            <li><a href="{{ url_for('sql_injection_vul', input=' OR 1=1') }}">OR 1=1</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='--') }}">-- (Comment)</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='#') }}"># (Comment)</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='UNION SELECT') }}">UNION SELECT</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='DROP TABLE users') }}">DROP TABLE users</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='SELECT * FROM users') }}">SELECT * FROM users</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='SELECT username FROM users') }}">SELECT username FROM users</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='AND (SELECT 1 FROM users)') }}">AND (SELECT 1 FROM users)</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='INSERT INTO users VALUES (1, \"admin\", \"password\")') }}">INSERT INTO users VALUES</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='EXEC sp_executesql') }}">EXEC sp_executesql</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='DECLARE @username AS varchar(50)') }}">DECLARE @username AS varchar(50)</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='CREATE TABLE test_table') }}">CREATE TABLE test_table</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='ALTER TABLE users ADD age INT') }}">ALTER TABLE users ADD age INT</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='SHOW TABLES') }}">SHOW TABLES</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='SET @@session.sql_mode = \"STRICT_TRANS_TABLES\"') }}">SET @@session.sql_mode</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='TRUNCATE TABLE users') }}">TRUNCATE TABLE users</a></li>
+            <li><a href="{{ url_for('sql_injection_vul', input='SELECT * FROM INFORMATION_SCHEMA.TABLES') }}">SELECT FROM INFORMATION_SCHEMA.TABLES</a></li>
+        </ul>
+        <div class="footer">
+            <p>Use this information wisely and only test for vulnerabilities on systems you have explicit permission to test.</p>
+            <a href="{{ url_for('home') }}">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

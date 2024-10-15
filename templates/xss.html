@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding XSS Vulnerabilities</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(120deg, #8e44ad, #5e3370);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #f7f7f7;
+            text-align: center;
+        }
+
+        p {
+            line-height: 1.6;
+            margin: 15px 0;
+            color: #eee;
+        }
+
+        .highlight {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            word-wrap: break-word;
+            transition: background 0.3s ease;
+        }
+
+        .highlight strong {
+            color: #f1c40f;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            word-wrap: break-word;
+            transition: background 0.3s ease;
+        }
+
+        ul li:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        ul li a {
+            color: #fff;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #ddd;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #f1c40f;
+        }
+
+        /* Custom scrollbar styling */
+        .container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Understanding XSS Vulnerabilities</h1>
+        <p>
+            Cross-Site Scripting (XSS) is a <strong>security vulnerability</strong> that allows attackers to inject malicious scripts into web pages viewed by other users. 
+            By exploiting XSS, attackers can steal cookies, session tokens, or other sensitive information, and perform actions on behalf of the user.
+        </p>
+        <div class="highlight">
+            <p><strong>Example:</strong> An attacker might inject a script into a comment box like <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code>, which could execute when another user views the comment.</p>
+        </div>
+        <p>
+            XSS attacks can lead to <strong>data theft</strong>, <strong>session hijacking</strong>, and more. To prevent XSS, developers should implement 
+            proper output encoding, input validation, and use frameworks that automatically escape XSS by design.
+        </p>
+        <ul>
+            <li><a href="{{ url_for('xss_vul', input='<script>alert(1)</script>') }}">&lt;script&gt;alert(1)&lt;/script&gt;</a></li>
+            <li><a href="{{ url_for('xss_vul', input='javascript:alert(1)') }}">javascript:alert(1)</a></li>
+            <li><a href="{{ url_for('xss_vul', input='<img src=x onerror=alert(1)>') }}">&lt;img src=x onerror=alert(1)&gt;</a></li>
+            <li><a href="{{ url_for('xss_vul', input='<iframe src="javascript:alert(1)"></iframe>') }}">&lt;iframe src="javascript:alert(1)"&gt;&lt;/iframe&gt;</a></li>
+            <li><a href="{{ url_for('xss_vul', input='<a href="javascript:alert(1)">Click me</a>') }}">&lt;a href="javascript:alert(1)"&gt;Click me&lt;/a&gt;</a></li>
+            <li><a href="{{ url_for('xss_vul', input='<body onload=alert(1)>') }}">&lt;body onload=alert(1)&gt;</a></li>
+            <li><a href="{{ url_for('xss_vul', input='<svg onload=alert(1)>') }}">&lt;svg onload=alert(1)&gt;</a></li>
+            <li><a href="{{ url_for('xss_vul', input='document.cookie') }}">document.cookie</a></li>
+            <li><a href="{{ url_for('xss_vul', input='eval("alert(1)")') }}">eval("alert(1)")</a></li>
+            <li><a href="{{ url_for('xss_vul', input='setTimeout("alert(1)", 1000)') }}">setTimeout("alert(1)", 1000)</a></li>
+            <li><a href="{{ url_for('xss_vul', input='setInterval("alert(1)", 1000)') }}">setInterval("alert(1)", 1000)</a></li>
+            <li><a href="{{ url_for('xss_vul', input='onerror=alert(1)') }}">onerror=alert(1)</a></li>
+            <li><a href="{{ url_for('xss_vul', input='<style>body{background: red;}</style>') }}">&lt;style&gt;body{background: red;}&lt;/style&gt;</a></li>
+        </ul>
+        <div class="footer">
+            <p>Use this information wisely and only test for vulnerabilities on systems you have explicit permission to test.</p>
+            <a href="{{ url_for('home') }}">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

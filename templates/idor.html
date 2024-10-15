@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding IDOR Vulnerabilities</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(120deg, #e67e22, #d35400);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #f7f7f7;
+            text-align: center;
+        }
+
+        p {
+            line-height: 1.6;
+            margin: 15px 0;
+            color: #eee;
+        }
+
+        .highlight {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            word-wrap: break-word;
+            transition: background 0.3s ease;
+        }
+
+        .highlight strong {
+            color: #f1c40f;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            word-wrap: break-word;
+            transition: background 0.3s ease;
+        }
+
+        ul li:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        ul li a {
+            color: #fff;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #ddd;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #f1c40f;
+        }
+
+        /* Custom scrollbar styling */
+        .container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Understanding IDOR Vulnerabilities</h1>
+        <p>
+            Insecure Direct Object References (IDOR) is a <strong>security vulnerability</strong> that allows attackers to bypass authorization 
+            and access resources or operations that they are not allowed to. This can happen when an application exposes a reference to an internal object, 
+            such as a file or a database record, and an attacker can manipulate the reference to access other objects.
+        </p>
+        <div class="highlight">
+            <p><strong>Example:</strong> An attacker might change the URL from <code>example.com/user?id=1</code> to <code>example.com/user?id=2</code> to access another user's data.</p>
+        </div>
+        <p>
+            IDOR attacks can lead to <strong>data exposure</strong>, <strong>privacy breaches</strong>, and other severe consequences. 
+            To prevent IDOR, developers should implement proper access controls, validate user inputs, and use indirect references for sensitive data.
+        </p>
+        <ul>
+            <li><a href="{{ url_for('idor_vul', user_id='1') }}">user_id=1</a></li>
+            <li><a href="{{ url_for('idor_vul', account_id='123') }}">account_id=123</a></li>
+            <li><a href="{{ url_for('idor_vul', order_id='456') }}">order_id=456</a></li>
+            <li><a href="{{ url_for('idor_vul', document_id='789') }}">document_id=789</a></li>
+            <li><a href="{{ url_for('idor_vul', file_id='101112') }}">file_id=101112</a></li>
+            <li><a href="{{ url_for('idor_vul', ticket_id='131415') }}">ticket_id=131415</a></li>
+        </ul>
+        <div class="footer">
+            <p>Use this information wisely and only test for vulnerabilities on systems you have explicit permission to test.</p>
+            <a href="{{ url_for('home') }}">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Command Injection Vulnerabilities</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(120deg, #3498db, #2980b9); 
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #f7f7f7;
+            text-align: center;
+        }
+
+        p {
+            line-height: 1.6;
+            margin: 15px 0;
+            color: #eee;
+        }
+
+        .highlight {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            word-wrap: break-word;
+            transition: background 0.3s ease;
+        }
+
+        .highlight strong {
+            color: #f1c40f;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            word-wrap: break-word;
+            transition: background 0.3s ease;
+        }
+
+        ul li:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        ul li a {
+            color: #fff;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #ddd;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #f1c40f;
+        }
+
+        /* Custom scrollbar styling */
+        .container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Understanding Command Injection Vulnerabilities</h1>
+        <p>
+            Command Injection is a <strong>security vulnerability</strong> that allows attackers to execute arbitrary commands on a host operating system via a vulnerable application. 
+            By exploiting command injection, attackers can gain unauthorized access to sensitive data or even take control of the system.
+        </p>
+        <div class="highlight">
+            <p><strong>Example:</strong> An attacker might input a command such as <code>cmd /c dir</code>, which could execute on the server.</p>
+        </div>
+        <p>
+            Command injection attacks can lead to <strong>data exposure</strong>, <strong>system compromise</strong>, and other severe consequences. 
+            To prevent command injection, developers should implement strict input validation, limit command execution to a safe context, and use parameterized commands when interacting with the operating system.
+        </p>
+        <ul>
+            <li><a href="{{ url_for('com_inj_vul', input='cmd /c dir') }}">cmd /c dir</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='start notepad.exe') }}">start notepad.exe</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='start cmd') }}">start cmd</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='powershell Get-Process') }}">powershell Get-Process</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='echo Hello World') }}">echo Hello World</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='dir C:\\') }}">dir C:\</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='type myfile.txt') }}">type myfile.txt</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='del myfile.txt') }}">del myfile.txt</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='copy file1.txt file2.txt') }}">copy file1.txt file2.txt</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='move file1.txt folder\\') }}">move file1.txt folder\</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='mkdir newfolder') }}">mkdir newfolder</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='rmdir newfolder') }}">rmdir newfolder</a></li>
+            <li><a href="{{ url_for('com_inj_vul', input='start notepad.exe') }}">start notepad.exe</a></li>
+        </ul>
+        <div class="footer">
+            <p>Use this information wisely and only test for vulnerabilities on systems you have explicit permission to test.</p>
+            <a href="{{ url_for('home') }}">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

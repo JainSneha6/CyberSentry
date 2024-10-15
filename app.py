@@ -1,5 +1,4 @@
-from flask import Flask, request, render_template_string, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, render_template, redirect, url_for, render_template_string
 import logging
 import html
 import subprocess
@@ -13,54 +12,77 @@ get_requests = []
 
 @app.before_request
 def log_request_info():
-    # Log only GET requests
     if request.method == 'GET':
         request_info = f'GET request to {request.path} with args: {request.args}'
         app.logger.info(request_info)
-        get_requests.append(request_info)  # Store request info in the list
-        
+        get_requests.append(request_info)
+
 @app.before_request
 def log_request_info_1():
     if request.method == 'GET':
-        # Store the full URL of the request, including the query string
-        request_info = f'{request.url}'
+        request_info = f'GET request to {request.url}'
         app.logger.info(f'Logged request: {request_info}')
         get_requests.append(html.escape(request_info))
 
 @app.route('/')
 def home():
     app.logger.info('GET request to home')
-    return 'Home Page'
+    return render_template('home.html')
 
-@app.route('/example', methods=['GET'])
-def example():
-    # Assume user input is passed as a query parameter
+@app.route('/sql-injection', methods=['GET'])
+def sql_injection():
+    return render_template('sql_injection.html')
+
+@app.route('/sql_injection_vul', methods=['GET','POST'])
+def sql_injection_vul():
+    return render_template('sql_injection_vul.html')
+
+@app.route('/xss', methods=['GET'])
+def xss():
+    return render_template('xss.html')
+
+@app.route('/xss_vul', methods=['GET', 'POST'])
+def xss_vul():
     user_input = request.args.get('input', '')
-    
-    # Vulnerable command execution (Command Injection vulnerability)
+    return render_template('xss_vul.html', user_input=user_input)
+
+@app.route('/com_inj', methods=['GET'])
+def com_inj():
+    return render_template('com_inj.html')
+
+@app.route('/com_inj_vul', methods=['GET', 'POST'])
+def com_inj_vul():
+    command_result = None
+    user_input = ''
+    user_input = request.args.get('input', '')
     if user_input:
         try:
-            # WARNING: This is insecure and should not be used in production!
             output = subprocess.check_output(user_input, shell=True, stderr=subprocess.STDOUT, text=True)
-            command_result = f'<pre>{output}</pre>'
+            command_result = output
         except subprocess.CalledProcessError as e:
-            command_result = f'<pre>Error: {e.output}</pre>'
-        
-        # Log the command execution attempt
+            command_result = f'Error: {e.output}'
+            
+            # Log the command execution attempt
         app.logger.info(f'Executed command: {user_input}')
-        get_requests.append(f'Executed command: {user_input}')  # Store the executed command
-        
-        return f'''
-            <h1>Command Execution Results</h1>
-            <p>Your command: {user_input}</p>
-            <h2>Result:</h2>
-            {command_result}
-        '''
+        get_requests.append(f'Executed command: {user_input}')
 
-    return f'''
-        <h1>Query Results</h1>
-        <p>Your input: {user_input}</p>
-    '''
+    return render_template('com_inj_vul.html', user_input=user_input, command_result=command_result)
+
+@app.route('/idor', methods=['GET'])
+def idor():
+    return render_template('idor.html')
+
+@app.route('/idor_vul', methods=['GET'])
+def idor_vul():
+    return render_template('idor_vul.html')
+
+@app.route('/file_inclusion', methods=['GET'])
+def file_inclusion():
+    return render_template('file_inclusion.html')
+
+@app.route('/file_inclusion_vul', methods=['GET'])
+def file_inclusion_vul():
+    return render_template('file_inclusion_vul.html')
 
 @app.route('/requests', methods=['GET'])
 def display_requests():
@@ -71,18 +93,17 @@ def display_requests():
     requests_html += '</ul>'
     return render_template_string(requests_html)
 
-@app.route('/redirect', methods=['GET'])
+@app.route('/redirect', methods=['GET', 'POST'])
 def open_redirect():
-    # Get the redirect URL from the query parameter
-    redirect_url = request.args.get('url', '')
+    redirect_url = ''
+    if request.method == 'POST':
+        redirect_url = request.form.get('url', '')
+        
+        if redirect_url:
+            app.logger.info(f'Redirecting to: {redirect_url}')
+            return redirect(redirect_url)
     
-    # Here, you would typically validate the redirect_url to prevent open redirects
-    # For demonstration, we'll just redirect without validation
-    if redirect_url:
-        app.logger.info(f'Redirecting to: {redirect_url}')
-        return redirect(redirect_url)
-    
-    return 'No URL provided for redirection.'
+    return render_template('redirect.html', redirect_url=redirect_url)
 
 if __name__ == '__main__':
     app.run(debug=True)

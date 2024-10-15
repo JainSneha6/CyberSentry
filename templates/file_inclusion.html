@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding File Inclusion Vulnerabilities</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(120deg, #2ecc71, #27ae60);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #f7f7f7;
+            text-align: center;
+        }
+
+        p {
+            line-height: 1.6;
+            margin: 15px 0;
+            color: #eee;
+        }
+
+        .highlight {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            word-wrap: break-word;
+            transition: background 0.3s ease;
+        }
+
+        .highlight strong {
+            color: #f1c40f;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            word-wrap: break-word;
+            transition: background 0.3s ease;
+        }
+
+        ul li:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        ul li a {
+            color: #fff;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #ddd;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #f1c40f;
+        }
+
+        /* Custom scrollbar styling */
+        .container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Understanding File Inclusion Vulnerabilities</h1>
+        <p>
+            File Inclusion vulnerabilities allow attackers to include files on a server through the web browser. 
+            This can lead to local file inclusion (LFI) or remote file inclusion (RFI) attacks, exposing sensitive data or executing malicious scripts.
+        </p>
+        <div class="highlight">
+            <p><strong>Example:</strong> An attacker might manipulate a URL to include sensitive files, such as <code>example.com/index.php?file=../../etc/passwd</code>.</p>
+        </div>
+        <p>
+            These vulnerabilities can result in severe consequences, including data exposure and server compromise. 
+            To mitigate these risks, developers should sanitize input, implement access controls, and avoid exposing sensitive files.
+        </p>
+        <ul>
+            <li><a href="{{ url_for('file_inclusion_vul', file='file://') }}">file://</a></li>
+            <li><a href="{{ url_for('file_inclusion_vul', file='http://example.com/malicious.txt') }}">http://</a></li>
+            <li><a href="{{ url_for('file_inclusion_vul', file='https://example.com/malicious.txt') }}">https://</a></li>
+            <li><a href="{{ url_for('file_inclusion_vul', file='file.php') }}">.php file</a></li>
+            <li><a href="{{ url_for('file_inclusion_vul', file='file.asp') }}">.asp file</a></li>
+            <li><a href="{{ url_for('file_inclusion_vul', file='file.jsp') }}">.jsp file</a></li>
+            <li><a href="{{ url_for('file_inclusion_vul', file='config.ini') }}">.ini file</a></li>
+            <li><a href="{{ url_for('file_inclusion_vul', file='logfile.log') }}">.log file</a></li>
+        </ul>
+        <div class="footer">
+            <p>Use this information wisely and only test for vulnerabilities on systems you have explicit permission to test.</p>
+            <a href="{{ url_for('home') }}">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
