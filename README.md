@@ -11,8 +11,6 @@ CyberSentry is a project designed to simulate common web application vulnerabili
 |------------------------------|----------------------------------------------------------------------------------------------------------------|
 | **Vulnerability Simulation**          | Includes a simulated website with vulnerabilities to demonstrate unauthorized access risks  |
 | **Vulnerability Assessment Tool** | A Tkinter-based GUI tool (`CyberSentry`) for scanning and identifying vulnerabilities in web applications.   |
-| **Email Reporting**          | Automatically sends a vulnerability scan report via email if potential vulnerabilities are found.               |
-| **Beautiful GUI**            | A user-friendly and visually appealing interface using Tkinter for better user experience.                     |
 
 ## Simulated Vulnerabilities
 
@@ -27,5 +25,19 @@ CyberSentry is a project designed to simulate common web application vulnerabili
 | **Open Redirect**                  | Enables open redirect vulnerabilities, allowing redirection to arbitrary URLs specified by the user.           |
 | **SSRF (Server-Side Request Forgery)** | Demonstrates SSRF, allowing the user to force the server to make requests to internal or external services. |
 | **XXE (XML External Entity)**      | Simulates an XXE vulnerability by parsing XML with external entities, allowing access to local files.           |
+
+## Vulnerability Scanner
+
+| **Feature**                        | **Description**                                                                                             |
+|------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| **Automated Scan**                 | Automatically scans logged requests from the web application to detect potential vulnerabilities.             |
+| **Pattern-Based Detection**        | Uses predefined regex patterns to identify common vulnerabilities like SQL Injection, XSS, and Command Injection. |
+| **Progress Tracking**              | Displays real-time progress of the scanning process with a visually appealing progress bar.                  |
+| **Detailed Results**               | Provides a detailed list of identified vulnerabilities, including their descriptions and where they were found. |
+| **Threaded Scanning**              | Uses threading to run scans in the background, keeping the GUI responsive during the scanning process.       |
+| **Customizable Patterns**          | Allows adding new patterns to extend the scanner's detection capabilities.                                   |
+| **Email Reporting**                | Sends a detailed scan report via email when vulnerabilities are detected, ensuring quick alerts for critical issues. |
+| **Beautiful GUI**                  | Features a clean and aesthetic Tkinter-based interface for easy interaction and better user experience.       |
+
 
 
