@@ -3,7 +3,7 @@ import logging
 import html
 import subprocess
 import requests
-from lxml import etree  # Make sure you have lxml installed
+from lxml import etree 
 
 app = Flask(__name__)
 
@@ -164,10 +164,10 @@ def xxe_vul():
     if request.method == 'POST':
         # Simulate attacker sending a crafted XML document for Windows
         xxe_payload = '''<?xml version="1.0"?>
-<!DOCTYPE foo [
-    <!ENTITY xxe SYSTEM "file:///C:/Windows/System32/drivers/etc/hosts">
-]>
-<foo>XXE Test: &xxe;</foo>
+            <!DOCTYPE foo [
+                <!ENTITY xxe SYSTEM "file:///C:/Windows/System32/drivers/etc/hosts">
+            ]>
+            <foo>XXE Test: &xxe;</foo>
         '''
         try:
             # Parse the XML data (simulate the processing)
@@ -180,9 +180,6 @@ def xxe_vul():
             app.logger.error(f"XXE attempt failed: {str(e)}")
 
     return render_template('xxe_vul.html', fetched_data=fetched_data, error=error)
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)

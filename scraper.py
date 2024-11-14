@@ -2,34 +2,46 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 import requests
 from bs4 import BeautifulSoup
-import re
+import joblib
 import threading
 import time
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Load the trained model
+model = joblib.load('url_vulnerability_model.joblib')
 
 SENDER_EMAIL = ""
 SENDER_PASSWORD = ""
 RECIPIENT_EMAIL = ""
 EMAIL_SUBJECT = "CyberSentry Vulnerability Scan Report"
 
-def send_email(subject, body):
-        try:
-            msg = MIMEMultipart()
-            msg['From'] = SENDER_EMAIL
-            msg['To'] = RECIPIENT_EMAIL
-            msg['Subject'] = subject
-            msg.attach(MIMEText(body, 'plain'))
+MAX_REQUESTS_PER_MINUTE = 100  # Max requests allowed per minute (for DoS detection)
+MAX_RESPONSE_TIME = 2  # Max acceptable response time in seconds
 
-            with smtplib.SMTP('smtp.gmail.com', 587) as server:
-                server.starttls()
-                server.login(SENDER_EMAIL, SENDER_PASSWORD)
-                server.send_message(msg)
-            
-            print("Email sent successfully.")
-        except Exception as e:
-            print(f"Failed to send email: {e}")
+request_count = 0
+start_time = time.time()
+
+# Function to send an email report
+def send_email(subject, body):
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = SENDER_EMAIL
+        msg['To'] = RECIPIENT_EMAIL
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(SENDER_EMAIL, SENDER_PASSWORD)
+            server.send_message(msg)
+        
+        print("Email sent successfully.")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
 
 class CyberSecurityScannerApp:
     def __init__(self, master):
@@ -38,7 +50,7 @@ class CyberSecurityScannerApp:
         master.geometry("900x700")
         master.configure(bg="#0A0E12")
 
-        self.url = "http://localhost:5000/requests"  
+        self.url = "http://localhost:5000/requests"  # URL for scraping test requests
         self.create_widgets()
 
     def create_widgets(self):
@@ -93,124 +105,112 @@ class CyberSecurityScannerApp:
     def run_scan(self):
         try:
             response = requests.get(self.url)
+            response_time = time.time() - start_time
+            self.detect_dos_attack(response, response_time)  # Check for DoS attack
+
             if response.status_code == 200:
                 soup = BeautifulSoup(response.content, 'html.parser')
                 requests_list = soup.find_all('li')
-                self.check_vulnerabilities(requests_list)
+                self.assess_vulnerabilities(requests_list)
             else:
                 self.update_results(f"Failed to retrieve requests. Status code: {response.status_code}")
         except requests.RequestException as e:
             self.update_results(f"Error occurred while fetching the target: {str(e)}")
         self.progress_bar["value"] = 100
 
-    def check_vulnerabilities(self, requests_list):
-        vulnerabilities = [
-            ("SQL Injection", self.sql_injection_patterns(), 'with args:'),
-            ("XSS", self.xss_patterns(), 'xss_vul?input='),
-            ("Command Injection", self.command_injection_patterns(), 'com_inj_vul?input='),
-            ("IDOR", self.idor_patterns(), 'idor_vul?'),
-            ("File Inclusion", self.file_inclusion_patterns(), 'file_inclusion_vul?file='),
-            ("Directory Traversal", self.directory_traversal_patterns(), 'dir_trav_vul?pattern='),
-            ("Open Redirect", self.open_redirect_patterns(), 'open_redirect_vul?url='),
-            ("SSRF", self.ssrf_patterns(), 'ssrf_vul?url=')
-        ]
+    def assess_vulnerabilities(self, requests_list):
+        vulnerabilities_found = []
+        risk_scores = {'Low': 0, 'Medium': 0, 'High': 0}
+        vulnerabilities_by_type = {}
 
-        total_checks = len(vulnerabilities) + 1  # +1 for XXE check
-        for index, (vuln_type, patterns, identifier) in enumerate(vulnerabilities):
-            self.check_pattern(requests_list, patterns, vuln_type, identifier)
-            self.progress_bar["value"] = (index + 1) * (100 / total_checks)
-            self.master.update_idletasks()
-            time.sleep(0.5)  # Simulate scanning time
+        for index, req in enumerate(requests_list):
+            url = req.get_text().strip()
 
-        # XXE Check
-        xxe_found = any('xxe_vul' in req.get_text() for req in requests_list)
-        if xxe_found:
-            self.update_results("⚠️ Potential XXE Vulnerability Found:\n   file:///C:/Windows/System32/drivers/etc/hosts")
-        else:
-            self.update_results("✅ No XXE vulnerabilities found.")
+            # Skip URLs with ImmutableMultiDict in the query parameters
+            if 'ImmutableMultiDict' in url:
+                continue
             
-        if "⚠️" in self.results_text.get(1.0, tk.END):
+            predicted_vulnerability = model.predict([url])[0]
+
+            if predicted_vulnerability != "Safe":  # Only display vulnerabilities
+                self.update_results(f"⚠️ URL: {url}\nPredicted Vulnerability: {predicted_vulnerability}\n")
+                vulnerabilities_found.append(predicted_vulnerability)
+
+                # Increase count for vulnerability type
+                vulnerabilities_by_type[predicted_vulnerability] = vulnerabilities_by_type.get(predicted_vulnerability, 0) + 1
+                
+                # Assign risk scores based on vulnerability type
+                if predicted_vulnerability in ['SQL Injection', 'Cross-site Scripting']:
+                    risk_scores['High'] += 1
+                elif predicted_vulnerability in ['Cross-Site Request Forgery']:
+                    risk_scores['Medium'] += 1
+                else:
+                    risk_scores['Low'] += 1
+
+            # Update progress bar
+            progress = (index + 1) * (100 / len(requests_list))
+            self.progress_bar["value"] = progress
+            self.master.update_idletasks()
+            time.sleep(0.5)  # Simulate processing time
+
+        # Send an email report if vulnerabilities are found
+        if any("⚠️" in vuln for vuln in vulnerabilities_found):
             report_body = self.results_text.get(1.0, tk.END)
             send_email(EMAIL_SUBJECT, report_body)
-
-    def check_pattern(self, requests_list, patterns, vulnerability_type, request_identifier):
-        vulnerabilities_found = []
-        for req in requests_list:
-            request_text = req.get_text()
-            if request_identifier in request_text:
-                args_text = request_text.split(request_identifier)[1].strip()
-                param_list = [param.strip().strip('"') for param in args_text.split(',') if param.strip()]
-                param_list = [param for param in param_list if 'input' not in param]
-
-                for param_value in param_list:
-                    if param_value and any(re.search(pattern, param_value, re.IGNORECASE) for pattern in patterns):
-                        vulnerabilities_found.append(f"   {request_text.strip()}")
-                        break
-
-        if vulnerabilities_found:
-            self.update_results(f"⚠️ Potential {vulnerability_type} Vulnerabilities Found:")
-            for vulnerability in vulnerabilities_found:
-                self.update_results(vulnerability)
-        else:
-            self.update_results(f"✅ No {vulnerability_type} vulnerabilities found.")
+        
+        # Visualize meaningful graphs
+        self.visualize_vulnerabilities(vulnerabilities_by_type)
+        self.visualize_risk_distribution(risk_scores)
 
     def update_results(self, message):
         self.results_text.insert(tk.END, message + "\n\n")
         self.results_text.see(tk.END)
         self.results_text.update_idletasks()
 
-    # Vulnerability patterns methods
-    def sql_injection_patterns(self):
-        return [
-            r"\s*OR\s*1=1", r"\s*--", r"\s*#", r"UNION SELECT", r"DROP\s+TABLE\s+\w+",
-            r"SELECT\s+\*?\s+FROM\s+\w+", r"SELECT\s+\w+\s+FROM\s+\w+", r"AND\s+\(SELECT\s+\d+\s+FROM",
-            r"INSERT\s+INTO\s+\w+\s+VALUES\s*\(", r"EXEC\s+sp_.*", r"DECLARE\s+\w+\s+AS",
-            r"CREATE\s+TABLE\s+\w+", r"ALTER\s+TABLE\s+\w+\s+ADD", r"SHOW\s+TABLES",
-            r"SET\s+@@session.sql_mode", r"TRUNCATE\s+TABLE\s+\w+", r"SELECT\s+FROM\s+INFORMATION_SCHEMA.*"
-        ]
+    # Bar Chart for Vulnerabilities by Type
+    def visualize_vulnerabilities(self, vulnerabilities_by_type):
+        labels = list(vulnerabilities_by_type.keys())
+        counts = list(vulnerabilities_by_type.values())
+        
+        plt.figure(figsize=(10, 6))
+        plt.bar(labels, counts, color='salmon')
+        plt.xlabel('Vulnerability Type')
+        plt.ylabel('Count')
+        plt.title('Vulnerabilities by Type')
+        plt.xticks(rotation=45, ha="right")
+        plt.tight_layout()
+        plt.show()
 
-    def xss_patterns(self):
-        return [
-            r"<script.*?>.*?</script>", r"javascript:.*", r"on\w*=\s*['\"].*?['\"]",
-            r"<img.*?src=['\"]*.*?['\"].*?onerror=.*?>", r"<iframe.*?>.*?</iframe>",
-            r"<a.*?href=['\"]*javascript:.*?['\"].*?>", r"<meta.*?http-equiv=['\"]refresh['\"].*?>",
-            r"<link.*?href=['\"]*.*?['\"].*?rel=['\"]stylesheet['\"]", r"<body.*?onload=.*?>",
-            r"<svg.*?onload=.*?>", r"document\.cookie", r"eval\s*\(.*?\)", r"setTimeout\s*\(.*?\)",
-            r"setInterval\s*\(.*?\)", r"onerror\s*=\s*['\"].*?['\"]", r"<style.*?>.*?</style>"
-        ]
+    # Pie Chart for Risk Distribution
+    def visualize_risk_distribution(self, risk_scores):
+        labels = list(risk_scores.keys())
+        sizes = list(risk_scores.values())
+        colors = ['#ff6666', '#ffcc99', '#66b3ff']
 
-    def command_injection_patterns(self):
-        return [
-            r"(?:^|&|\|)(?:cmd|powershell|start|echo|dir|type|del|copy|move|mkdir|rmdir)(?:\s+[^&|]*)?$",
-            r"^cmd", r"^start\s*.*$", r"^powershell\s*.*$", r"^echo\s*.*$", r"^dir\s*.*$",
-            r"^type\s*.*$", r"^del\s*.*$", r"^copy\s*.*$", r"^move\s*.*$", r"^mkdir\s*.*$", r"^rmdir\s*.*$"
-        ]
+        plt.figure(figsize=(8, 8))
+        plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+        plt.title('Risk Distribution of Vulnerabilities')
+        plt.show()
 
-    def idor_patterns(self):
-        return [
-            r"user_id=\d+", r"account_id=\d+", r"order_id=\d+",
-            r"document_id=\d+", r"file_id=\d+", r"ticket_id=\d+"
-        ]
+    # DoS attack detection
+    def detect_dos_attack(self, response, response_time):
+        global request_count, start_time
 
-    def file_inclusion_patterns(self):
-        return [
-            r"file://", r"http://", r"https://", r"\.php",
-            r"\.asp", r"\.jsp", r"\.ini", r"\.log"
-        ]
+        current_time = time.time()
+        elapsed_time = current_time - start_time
 
-    def directory_traversal_patterns(self):
-        return [
-            r"\.\./\.\./\.\./", r"\.\./", r"/etc/passwd", r"boot.ini"
-        ]
+        if elapsed_time >= 60:  # Every minute, reset the count
+            start_time = current_time
+            request_count = 0
 
-    def open_redirect_patterns(self):
-        return [r"http?://", r"//"]
-
-    def ssrf_patterns(self):
-        return [
-            r"(localhost|127\.0\.0\.1)", r"(0\.0\.0\.0)", r"(\d{1,3}\.){3}\d{1,3}",
-            r"([a-z0-9\-]+\.)+[a-z]{2,}", r"file://", r"ftp://"
-        ]
+        request_count += 1
+        if request_count > MAX_REQUESTS_PER_MINUTE:
+            self.update_results(f"⚠️ Potential DoS Attack Detected! Too many requests in a short period.")
+            send_email("DoS Attack Detected", "Too many requests were detected within a short time.")
+        
+        if response_time > MAX_RESPONSE_TIME:
+            self.update_results(f"⚠️ High response time detected: {response_time:.2f} seconds.")
+            send_email("High Response Time Detected", f"Response time exceeded threshold: {response_time:.2f} seconds.")
 
 if __name__ == "__main__":
     root = tk.Tk()
