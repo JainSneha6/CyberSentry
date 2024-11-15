@@ -10,6 +10,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import matplotlib.pyplot as plt
 import numpy as np
+from collections import deque
 
 # Load the trained model
 model = joblib.load('url_vulnerability_model.joblib')
@@ -21,6 +22,8 @@ EMAIL_SUBJECT = "CyberSentry Vulnerability Scan Report"
 
 MAX_REQUESTS_PER_MINUTE = 100  # Max requests allowed per minute (for DoS detection)
 MAX_RESPONSE_TIME = 2  # Max acceptable response time in seconds
+
+request_timestamps = deque(maxlen=MAX_REQUESTS_PER_MINUTE)
 
 request_count = 0
 start_time = time.time()
@@ -134,15 +137,15 @@ class CyberSecurityScannerApp:
 
             if predicted_vulnerability != "Safe":  # Only display vulnerabilities
                 self.update_results(f"⚠️ URL: {url}\nPredicted Vulnerability: {predicted_vulnerability}\n")
-                vulnerabilities_found.append(predicted_vulnerability)
+                vulnerabilities_found.append(f"❗ URL: {url} - {predicted_vulnerability}")
 
                 # Increase count for vulnerability type
                 vulnerabilities_by_type[predicted_vulnerability] = vulnerabilities_by_type.get(predicted_vulnerability, 0) + 1
                 
                 # Assign risk scores based on vulnerability type
-                if predicted_vulnerability in ['SQL Injection', 'Cross-site Scripting']:
+                if predicted_vulnerability in ['SQL Injection', 'XSS', 'Command Injection', 'File Inclusion', 'Open Redirect', 'Server-Side Request Forgery','XML External Entity']:
                     risk_scores['High'] += 1
-                elif predicted_vulnerability in ['Cross-Site Request Forgery']:
+                elif predicted_vulnerability in ['Directory Traversal', 'Insecure Direct Object Reference']:
                     risk_scores['Medium'] += 1
                 else:
                     risk_scores['Low'] += 1
@@ -153,11 +156,34 @@ class CyberSecurityScannerApp:
             self.master.update_idletasks()
             time.sleep(0.5)  # Simulate processing time
 
-        # Send an email report if vulnerabilities are found
-        if any("⚠️" in vuln for vuln in vulnerabilities_found):
-            report_body = self.results_text.get(1.0, tk.END)
-            send_email(EMAIL_SUBJECT, report_body)
-        
+        # Send an email report including all vulnerabilities
+        if vulnerabilities_found:
+            email_body = "⚠️ **Critical Cybersecurity Alert** ⚠️\n\n"
+            email_body += "The CyberSentry vulnerability scan has identified the following security issues:\n\n"
+            email_body += "\n".join(vulnerabilities_found)
+            email_body += "\n\n---\n"
+            email_body += "❗ **Risk Distribution:**\n"
+            email_body += f"- 🔴 High Risk: {risk_scores['High']}\n"
+            email_body += f"- 🟠 Medium Risk: {risk_scores['Medium']}\n"
+            email_body += f"- 🟢 Low Risk: {risk_scores['Low']}\n"
+            email_body += "---\n\n"
+
+            # Add action prompts
+            email_body += (
+                "🔍 **Recommended Actions:**\n"
+                "- Review and secure the endpoints listed above.\n"
+                "- Implement necessary patches or fixes for identified vulnerabilities.\n"
+                "- Conduct a deeper security audit if needed.\n\n"
+            )
+            email_body += (
+                "⚠️ **Immediate Attention Required for High-Risk Issues:**\n"
+                "- SQL Injection and Cross-Site Scripting (XSS) vulnerabilities pose severe threats.\n"
+                "- Ensure proper input validation and sanitization to prevent these attacks.\n\n"
+            )
+            email_body += "If you require assistance in addressing these vulnerabilities, please contact your cybersecurity team immediately."
+
+            send_email(EMAIL_SUBJECT, email_body)
+
         # Visualize meaningful graphs
         self.visualize_vulnerabilities(vulnerabilities_by_type)
         self.visualize_risk_distribution(risk_scores)
@@ -192,25 +218,29 @@ class CyberSecurityScannerApp:
         plt.title('Risk Distribution of Vulnerabilities')
         plt.show()
 
-    # DoS attack detection
     def detect_dos_attack(self, response, response_time):
-        global request_count, start_time
+        global start_time
 
         current_time = time.time()
-        elapsed_time = current_time - start_time
+        # Add the current request timestamp
+        request_timestamps.append(current_time)
 
-        if elapsed_time >= 60:  # Every minute, reset the count
-            start_time = current_time
-            request_count = 0
+        # Check if there are enough requests to suggest a DoS attack
+        if len(request_timestamps) == MAX_REQUESTS_PER_MINUTE:
+            # Calculate the time difference between the oldest and newest request
+            time_window = current_time - request_timestamps[0]
 
-        request_count += 1
-        if request_count > MAX_REQUESTS_PER_MINUTE:
-            self.update_results(f"⚠️ Potential DoS Attack Detected! Too many requests in a short period.")
-            send_email("DoS Attack Detected", "Too many requests were detected within a short time.")
-        
-        if response_time > MAX_RESPONSE_TIME:
-            self.update_results(f"⚠️ High response time detected: {response_time:.2f} seconds.")
-            send_email("High Response Time Detected", f"Response time exceeded threshold: {response_time:.2f} seconds.")
+            # If the time window is under 60 seconds, trigger the DoS alert
+            if time_window < 60:
+                self.update_results(f"⚠️ Potential DoS Attack Detected! {MAX_REQUESTS_PER_MINUTE} requests within {time_window:.2f} seconds.")
+                send_email("DoS Attack Detected", f"Too many requests detected in {time_window:.2f} seconds.")
+                # Clear timestamps after alert to avoid repeated notifications for the same burst
+                request_timestamps.clear()
+        else:
+            # Check for high response time alert
+            if response_time > MAX_RESPONSE_TIME:
+                self.update_results(f"⚠️ High response time detected: {response_time:.2f} seconds.")
+                send_email("High Response Time Detected", f"Response time exceeded threshold: {response_time:.2f} seconds.")
 
 if __name__ == "__main__":
     root = tk.Tk()
