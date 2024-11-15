@@ -14,17 +14,12 @@ CyberSentry is a project designed to simulate common web application vulnerabili
 
 ## Simulated Vulnerabilities
 
-| **Vulnerability**                  | **Description**                                                                                               |
-|------------------------------------|----------------------------------------------------------------------------------------------------------------|
-| **SQL Injection**                  | Demonstrates SQL Injection vulnerability, allowing users to inject SQL commands through input fields.           |
-| **XSS (Cross-Site Scripting)**     | Simulates XSS vulnerabilities by reflecting user input directly in the web page, enabling script injection.    |
-| **Command Injection**              | Enables command injection by executing user-supplied commands on the server, simulating remote code execution.  |
-| **IDOR (Insecure Direct Object References)** | Simulates IDOR by exposing direct access to objects like user IDs without proper authorization.       |
-| **File Inclusion**                 | Demonstrates file inclusion vulnerabilities, allowing users to include files from the server or local system.   |
-| **Directory Traversal**            | Simulates directory traversal attacks, enabling access to restricted directories or files on the server.        |
-| **Open Redirect**                  | Enables open redirect vulnerabilities, allowing redirection to arbitrary URLs specified by the user.           |
-| **SSRF (Server-Side Request Forgery)** | Demonstrates SSRF, allowing the user to force the server to make requests to internal or external services. |
-| **XXE (XML External Entity)**      | Simulates an XXE vulnerability by parsing XML with external entities, allowing access to local files.           |
+![image](https://github.com/user-attachments/assets/133b29f3-909a-4b99-a230-4acc289d8d8e)
+![image](https://github.com/user-attachments/assets/a3d06b1e-26d9-4f55-a474-089828258192)
+
+## Architecture
+![image](https://github.com/user-attachments/assets/1191db4e-f5d2-495d-9023-65bd713819d9)
+
 
 ## Vulnerability Scanner
 
