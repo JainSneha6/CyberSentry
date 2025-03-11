@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 import joblib
 
-data = pd.read_csv('Vulnerabilities.csv')  
+data = pd.read_csv('../datasets/Vulnerabilities.csv')  
 X = data['URL']
 y = data['Vulnerability Type']
 

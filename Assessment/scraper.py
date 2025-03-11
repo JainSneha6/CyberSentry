@@ -13,7 +13,7 @@ import numpy as np
 from collections import deque
 
 # Load the trained model
-model = joblib.load('url_vulnerability_model.joblib')
+model = joblib.load('../best_model.joblib')
 
 SENDER_EMAIL = ""
 SENDER_PASSWORD = ""
