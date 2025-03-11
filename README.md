@@ -45,6 +45,10 @@ The tool extracts web request data, analyzes patterns, and provides a comprehens
 
 ## URL Vulnerability Detection Using Machine Learning  
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/1c51ea85-2028-4898-b465-e46be4ad9727" width="800px">
+</p>
+
 Further the **above vulnerabilities** are classified based on their **vulnerability types** using different machine learning models. A dataset of labeled URLs is used to train and evaluate the models.  
 
 ### Model Performance Comparison  
@@ -67,6 +71,10 @@ Further the **above vulnerabilities** are classified based on their **vulnerabil
 ---
 
 ## URL Vulnerability Detection Using AI Models  
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c18d6f10-e859-421b-82a6-14076b9f7410" width="800px">
+</p>
 
 Further utilizing **Artificial Intelligence (AI) models** to detect vulnerabilities in URLs based on their characteristics. Several AI architectures, including transformer-based models and deep learning approaches, have been tested to compare their accuracy and efficiency.  
 
