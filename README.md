@@ -4,6 +4,11 @@
 
 The tool extracts web request data, analyzes patterns, and provides a comprehensive security report, helping security teams proactively address potential risks.
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/003eb027-4f3d-466d-bdb9-bb2e666a0491" width="800px">
+</p>
+
+
 ## Why CyberSentry?
 
 <details>
